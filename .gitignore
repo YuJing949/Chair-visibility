@@ -1,0 +1,18 @@
+# Ignore Python virtual environments
+venv/
+.venv/
+env/
+sam-env/
+
+# Jupyter-related
+__pycache__/
+.ipynb_checkpoints/
+
+# Model files, large outputs
+*.pt
+*.pth
+*.zip
+*.log
+
+# Output folder
+outcome/
