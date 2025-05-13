@@ -9,10 +9,16 @@ __pycache__/
 .ipynb_checkpoints/
 
 # Model files, large outputs
-*.pt
 *.pth
-*.zip
-*.log
+*.pt
+*.pkl
+*.h5
+*.ckpt
+*.tflite
+*.onnx
+*.lib
+*.dll
+*.pyd
 
 # Output folder
 outcome/
