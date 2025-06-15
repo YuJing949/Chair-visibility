@@ -10,7 +10,7 @@ import torch
 from PIL import Image
 
 # --- Project Modules ---
-from segment_anything import build_sam, SamPredictor
+from segment_anything import build_sam_vit_b, SamPredictor
 from utils import analyze_visual_contrast, overlay_mask
 from detect import detect_chairs
 
@@ -44,7 +44,6 @@ body, .stApp {
 </style>
 """, unsafe_allow_html=True)
 
-# --- Load SAM Model ---
 MODEL_PATH = "sam_vit_b_01ec64.pth"
 MODEL_URL = "https://dl.fbaipublicfiles.com/segment_anything/sam_vit_b_01ec64.pth"
 
@@ -53,7 +52,7 @@ if not os.path.exists(MODEL_PATH):
         urllib.request.urlretrieve(MODEL_URL, MODEL_PATH)
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
-sam = build_sam(checkpoint=MODEL_PATH).to(device)
+sam = build_sam_vit_b(checkpoint=MODEL_PATH).to(device)
 predictor = SamPredictor(sam)
 
 # --- UI Title ---
