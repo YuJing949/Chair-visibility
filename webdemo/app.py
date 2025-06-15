@@ -72,7 +72,7 @@ if uploaded_file:
     image = np.array(image_pil)
 
     # --- Resize if too large ---
-    max_dim = 1024
+    max_dim = 512
     if image.shape[0] > max_dim or image.shape[1] > max_dim:
         scale = max_dim / max(image.shape[0], image.shape[1])
         new_w = int(image.shape[1] * scale)
