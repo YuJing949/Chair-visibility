@@ -44,6 +44,7 @@ body, .stApp {
 </style>
 """, unsafe_allow_html=True)
 
+# --- Load SAM Model ---
 MODEL_PATH = "sam_vit_b_01ec64.pth"
 MODEL_URL = "https://dl.fbaipublicfiles.com/segment_anything/sam_vit_b_01ec64.pth"
 
@@ -69,6 +70,16 @@ if uploaded_file:
         st.stop()
 
     image = np.array(image_pil)
+
+    # --- Resize if too large ---
+    max_dim = 1024
+    if image.shape[0] > max_dim or image.shape[1] > max_dim:
+        scale = max_dim / max(image.shape[0], image.shape[1])
+        new_w = int(image.shape[1] * scale)
+        new_h = int(image.shape[0] * scale)
+        image = cv2.resize(image, (new_w, new_h), interpolation=cv2.INTER_AREA)
+        st.warning(f"Image was resized to {new_w}x{new_h} to improve performance.")
+
     st.image(image, caption="Uploaded Image", use_container_width=True)
 
     # --- Step 1: Detect Chairs ---
@@ -85,15 +96,19 @@ if uploaded_file:
             cx, cy = center
 
             # --- Step 2: Segmentation with SAM ---
-            predictor.set_image(image)
-            input_point = np.array([[cx, cy]])
-            input_label = np.array([1])
-            masks, _, _ = predictor.predict(
-                point_coords=input_point,
-                point_labels=input_label,
-                multimask_output=False
-            )
-            mask = masks[0]
+            try:
+                predictor.set_image(image)
+                input_point = np.array([[cx, cy]])
+                input_label = np.array([1])
+                masks, _, _ = predictor.predict(
+                    point_coords=input_point,
+                    point_labels=input_label,
+                    multimask_output=False
+                )
+                mask = masks[0]
+            except Exception as e:
+                st.error(f"Segmentation failed for chair {idx+1}: {e}")
+                continue
 
             # --- Step 3: Contrast Analysis ---
             results = analyze_visual_contrast(image, mask)
