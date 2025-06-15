@@ -3,8 +3,10 @@ import numpy as np
 import cv2
 import torch
 from PIL import Image
-from segment_anything import sam_model_registry, SamPredictor
+import os
+import urllib.request
 
+from segment_anything import sam_model_registry, SamPredictor
 from utils import analyze_visual_contrast, overlay_mask
 from detect import detect_chairs
 
@@ -39,7 +41,14 @@ body, .stApp {
 """, unsafe_allow_html=True)
 
 # --- Load SAM model ---
-sam_checkpoint = "D:/cci 2025/segmentation/sam_vit_b_01ec64.pth"
+MODEL_PATH = "sam_vit_b_01ec64.pth"
+MODEL_URL = "https://dl.fbaipublicfiles.com/segment_anything/sam_vit_b_01ec64.pth"
+
+if not os.path.exists(MODEL_PATH):
+    with st.spinner("Downloading SAM model (~357MB)..."):
+        urllib.request.urlretrieve(MODEL_URL, MODEL_PATH)
+
+sam_checkpoint = MODEL_PATH
 model_type = "vit_b"
 device = "cuda" if torch.cuda.is_available() else "cpu"
 sam = sam_model_registry[model_type](checkpoint=sam_checkpoint)
@@ -100,3 +109,4 @@ if uploaded_file:
                 st.success("This chair appears accessible to users with visual impairments.")
             else:
                 st.error("This chair may be hard to distinguish from the background. Consider choosing a chair with stronger color contrast.")
+
